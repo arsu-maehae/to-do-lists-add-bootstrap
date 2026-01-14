@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os  # <--- เพิ่ม fly.io
+import dj_database_url  # <--- เพิ่ม fly.io
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +22,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-tblvhvfm=k+d^w1lp9dr3hw3guyj)$%(#9@arkugcj*^^s_1=x'
+#SECRET_KEY = 'django-insecure-tblvhvfm=k+d^w1lp9dr3hw3guyj)$%(#9@arkugcj*^^s_1=x'
+
+# อ่าน Key จาก Server ถ้าไม่มีให้ใช้คีย์เดิม
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-tblvhvfm=k+d^w1lp9dr3hw3guyj)$%(#9@arkugcj*^^s_1=x')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#DEBUG = True --- เปลี่ยนบรรทัดนี้เป็นบรรทัดล่างนี้
+# ถ้าเจอตัวแปร FLY_APP_NAME แปลว่าอยู่บน Server ให้ปิด Debug
+DEBUG = 'FLY_APP_NAME' not in os.environ
 
-ALLOWED_HOSTS = []
+# อนุญาตให้เข้าได้ทุกเว็บ
+ALLOWED_HOSTS = ['*']
+
+# (สำคัญมากสำหรับ Fly.io) ป้องกัน Error เรื่อง CSRF
+CSRF_TRUSTED_ORIGINS = ['https://*.fly.dev']
 
 
 # Application definition
@@ -42,6 +53,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # <--- เพิ่มอันนี้ fly.io
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -73,12 +85,27 @@ WSGI_APPLICATION = 'superlists.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+#DATABASES = {
+   # 'default': {
+   #     'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+   # }
+#}
+
+# Database
+# ถ้ามี DATABASE_URL (จาก Fly) ให้ใช้ Postgres, ถ้าไม่มีใช้ SQLite (เครื่องเรา)
+if os.environ.get('DATABASE_URL'):
+    DATABASES = {
+        'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
 
 
 # Password validation
@@ -115,4 +142,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # <--- เพิ่ม fly.io
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' # <--- เพิ่ม fly.io
