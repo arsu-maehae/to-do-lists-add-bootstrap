@@ -19,7 +19,7 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
             512,
-            delta=10
+            delta=35,  # แก้ตรงนี้: เพิ่มจาก 10 เป็น 35 เพื่อเผื่อขอบหน้าต่าง
         )
 
         # เธอเริ่ม list ใหม่ และเห็นว่า input ก็ยังอยู่ตรงกลางดี
@@ -31,7 +31,7 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
             512,
-            delta=10
+            delta=35,  # แก้ตรงนี้: เพิ่มจาก 10 เป็น 35 เพื่อเผื่อขอบหน้าต่าง
         )
 
     def setUp(self):

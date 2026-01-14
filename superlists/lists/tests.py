@@ -8,13 +8,14 @@ class HomePageTest(TestCase):
         self.assertTemplateUsed(response, "home.html")
 
     # เพิ่ม method นี้
-    def test_renders_input_form(self):  
+    def test_renders_input_form(self):
         response = self.client.get("/")
-        # เปลี่ยนบรรทัดนี้: เพิ่ม action="/"
-        #self.assertContains(response, '<form method="POST" action="/">')
-        #self.assertContains(response, '<form method="POST">')
         self.assertContains(response, '<form method="POST" action="/lists/new">')
-        self.assertContains(response, '<input name="item_text"')
+        self.assertContains(
+            response,
+            '<input name="item_text" id="id_new_item" placeholder="Enter a to-do item" />',
+            html=True,
+        )
     
     # Test ตัวที่ 1: เช็คแค่การบันทึกข้อมูล
 
@@ -89,12 +90,16 @@ class ListViewTest(TestCase):
 
     def test_renders_input_form(self):
         mylist = List.objects.create()
-        response = self.client.get(f"/lists/{mylist.id}/")  
+        response = self.client.get(f"/lists/{mylist.id}/")
         self.assertContains(
             response,
             f'<form method="POST" action="/lists/{mylist.id}/add_item">',
         )
-        self.assertContains(response, '<input name="item_text"')
+        self.assertContains(
+            response,
+            '<input name="item_text" id="id_new_item" placeholder="Enter a to-do item" />',
+            html=True,
+        )
 
     #def test_displays_all_list_items(self):
        # mylist = List.objects.create()

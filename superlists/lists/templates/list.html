@@ -1,25 +1,18 @@
-<html>
-    <head>
-        <title>To-Do lists</title>
-    </head>
-    <body>
-        <div style="text-align: right; padding: 10px;">
-            <a href="/about/">
-                <button type="button">About Page</button>
-            </a>
-        </div>
+{% extends 'base.html' %}
 
-        <h1>Your To-Do lists</h1>
-        
-        <form method="POST" action="/lists/{{ list.id }}/add_item">
-            <input name="item_text" id="id_new_item" placeholder="Enter a to-do item" />
-            {% csrf_token %}
-        </form>
+{% block header_text %}Your To-Do lists{% endblock %}
 
-        <table id="id_list_table">
-            {% for item in list.item_set.all %}
-                <tr><td>{{ forloop.counter }}: {{ item.text }}</td></tr>
-            {% endfor %}
-        </table>
-    </body>
-</html>
+{% block form_action %}/lists/{{ list.id }}/add_item{% endblock %}
+
+{% block table %}
+  <table id="id_list_table" class="table">
+    {% for item in list.item_set.all %}
+      <tr><td>{{ forloop.counter }}: {{ item.text }}</td></tr>
+    {% endfor %}
+  </table>
+  
+  <div class="mt-3 text-center"> 
+      <a href="/" class="btn btn-secondary">Back to Home</a>
+  </div>
+
+{% endblock %}
