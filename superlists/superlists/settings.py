@@ -36,7 +36,12 @@ DEBUG = 'FLY_APP_NAME' not in os.environ
 ALLOWED_HOSTS = ['*']
 
 # (สำคัญมากสำหรับ Fly.io) ป้องกัน Error เรื่อง CSRF
-CSRF_TRUSTED_ORIGINS = ['https://*.fly.dev']
+# เพิ่มให้รองรับทั้ง Fly และ Railway ไปเลย (กันเหนียว)
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.fly.dev',
+    'https://*.railway.app',
+    'https://to-do-list-deploy-using-railway-production.up.railway.app' 
+]
 
 
 # Application definition
