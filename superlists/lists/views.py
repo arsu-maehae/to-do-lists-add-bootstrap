@@ -22,10 +22,24 @@ def view_list(request, list_id):
 
 def new_list(request):
     nulist = List.objects.create()
-    Item.objects.create(text=request.POST["item_text"], list=nulist)
+    # รับค่า priority (ถ้าไม่ส่งมา ให้เป็น medium)
+    priority = request.POST.get('priority', 'medium')
+    
+    Item.objects.create(
+        text=request.POST["item_text"], 
+        list=nulist,
+        priority=priority # <--- บันทึก Priority ลงไป
+    )
     return redirect(f"/lists/{nulist.id}/")
 
 def add_item(request, list_id):
     our_list = List.objects.get(id=list_id)
-    Item.objects.create(text=request.POST["item_text"], list=our_list)
+    # รับค่า priority
+    priority = request.POST.get('priority', 'medium')
+    
+    Item.objects.create(
+        text=request.POST["item_text"], 
+        list=our_list,
+        priority=priority # <--- บันทึก Priority ลงไป
+    )
     return redirect(f"/lists/{our_list.id}/")
