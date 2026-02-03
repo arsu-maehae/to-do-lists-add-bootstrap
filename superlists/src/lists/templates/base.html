@@ -19,7 +19,7 @@
             <form method="POST" action="{% block form_action %}{% endblock %}">
                 <!-- # Added input group for priority selection -->
               <div class="input-group">   
-                  <select name="priority" class="form-select" style="max-width: 130px;">
+                  <select name="priority" id="id_priority" class="form-select" style="max-width: 130px;">
                       <option value="high">High</option>
                       <option value="medium" selected>Medium</option>
                       <option value="low">Low</option>

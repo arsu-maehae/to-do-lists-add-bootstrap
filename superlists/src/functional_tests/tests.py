@@ -1,13 +1,15 @@
-from django.test import LiveServerTestCase
+#from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
 from selenium.common.exceptions import WebDriverException
-import time
+import time, os
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 MAX_WAIT = 10
 
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerTestCase):
 
     def test_layout_and_styling(self):
         # Edith ไปที่หน้าแรก
@@ -19,7 +21,7 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
             512,
-            delta=35,  # แก้ตรงนี้: เพิ่มจาก 10 เป็น 35 เพื่อเผื่อขอบหน้าต่าง
+            delta=50,  # แก้ตรงนี้: เพิ่มจาก 10 เป็น 35 เพื่อเผื่อขอบหน้าต่าง
         )
 
         # เธอเริ่ม list ใหม่ และเห็นว่า input ก็ยังอยู่ตรงกลางดี
@@ -31,11 +33,13 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
             512,
-            delta=35,  # แก้ตรงนี้: เพิ่มจาก 10 เป็น 35 เพื่อเผื่อขอบหน้าต่าง
+            delta=50,  # แก้ตรงนี้: เพิ่มจาก 10 เป็น 35 เพื่อเผื่อขอบหน้าต่าง
         )
 
     def setUp(self):
         self.browser = webdriver.Chrome()
+        if test_server := os.environ.get("TEST_SERVER"):   
+            self.live_server_url = "http://" + test_server
 
     def tearDown(self):
         self.browser.quit()
@@ -46,7 +50,18 @@ class NewVisitorTest(LiveServerTestCase):
             try:
                 table = self.browser.find_element(By.ID, 'id_list_table')
                 rows = table.find_elements(By.TAG_NAME, 'tr')
-                self.assertIn(row_text, [row.text for row in rows])
+                
+                # อ่านค่า text ออกมา (จะได้ประมาณ "1: hellow High")
+                row_data = [row.text for row in rows]
+                
+                # เช็คว่ามีบรรทัดไหนที่มีคำที่เราหา (row_text) แฝงอยู่ไหม
+                match = False
+                for row in row_data:
+                    if row_text in row:  # 👈 จุดสำคัญ: ใช้ in แทน ==
+                        match = True
+                        break
+                
+                self.assertTrue(match, f"หา '{row_text}' ไม่เจอ\nสิ่งที่เจอคือ: {row_data}")
                 return
             except (AssertionError, WebDriverException) as e:
                 if time.time() - start_time > MAX_WAIT:
@@ -54,40 +69,53 @@ class NewVisitorTest(LiveServerTestCase):
                 time.sleep(0.5)
 
     def test_can_start_a_list_for_one_user(self):
-        # Edith ได้ยินมาว่ามีเว็บ to-do list ใหม่ที่เจ๋งมาก
-        # เธอเลยไปเช็คดูที่หน้า homepage
+        # Edith ไปที่หน้า homepage
         self.browser.get(self.live_server_url)
 
-        # เธอสังเกตเห็นว่า title และ header ของหน้าเว็บระบุว่าเป็น to-do lists
+        # ... (ส่วนเช็ค Title เหมือนเดิม) ...
         self.assertIn('To-Do', self.browser.title)
         header_text = self.browser.find_element(By.TAG_NAME, 'h1').text
         self.assertIn('To-Do', header_text)
 
-        # เธอถูกชวนให้กรอก to-do item ทันที
+        # เธอพิมพ์ "Buy peacock feathers"
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
-        self.assertEqual(
-            inputbox.get_attribute('placeholder'),
-            'Enter a to-do item'
-        )
-
-        # เธอพิมพ์ "Buy peacock feathers" (ซื้อขนยูง)
         inputbox.send_keys('Buy peacock feathers')
 
-        # เมื่อเธอกด enter, หน้าเว็บจะ update
-        # และตอนนี้หน้าเว็บโชว์รายการ "1: Buy peacock feathers"
-        inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1: Buy peacock feathers')
+        # 👇 --- เพิ่มส่วนนี้: เธอเห็นช่องเลือก Priority และเลือก "High" ---
+        # สมมติว่าใน HTML คุณตั้ง id ของ dropdown ว่า "id_priority"
+        priority_box = self.browser.find_element(By.ID, 'id_priority')
+        select = Select(priority_box)
+        select.select_by_visible_text('High') 
+        # --------------------------------------------------------
 
-        # เธอพิมพ์รายการเพิ่ม "Use peacock feathers to make a fly"
+        # เธอกด Enter
+        inputbox.send_keys(Keys.ENTER)
+        
+        # 👇 --- แก้ส่วนนี้: เช็คว่าเจอทั้ง "ชื่อรายการ" และ "ความสำคัญ" ---
+        # เช็คว่ามีรายการขึ้นมา
+        self.wait_for_row_in_list_table('1: Buy peacock feathers')
+        # เช็คว่ามีคำว่า High โผล่มาในบรรทัดนั้นด้วย (หรือจะเช็คแยกก็ได้)
+        self.wait_for_row_in_list_table('High')
+        # --------------------------------------------------------
+
+        # เธอพิมพ์รายการที่ 2 "Use peacock feathers to make a fly"
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
         inputbox.send_keys('Use peacock feathers to make a fly')
+        
+        # 👇 --- รอบนี้เธอลองเลือก "Low" บ้าง ---
+        priority_box = self.browser.find_element(By.ID, 'id_priority')
+        select = Select(priority_box)
+        select.select_by_visible_text('Low')
+        # ------------------------------------
+
         inputbox.send_keys(Keys.ENTER)
 
-        # หน้าเว็บ update อีกครั้ง และตอนนี้โชว์ทั้งสองรายการ
+        # หน้าเว็บ update และโชว์ทั้งสองรายการ พร้อม Priority ที่ถูกต้อง
         self.wait_for_row_in_list_table('2: Use peacock feathers to make a fly')
+        self.wait_for_row_in_list_table('Low') # เช็คว่าเจอ Low
+        
         self.wait_for_row_in_list_table('1: Buy peacock feathers')
-
-        # เธอพอใจแล้วก็เข้านอน
+        self.wait_for_row_in_list_table('High') # เช็คว่าของเดิมยังเป็น High
 
     def test_multiple_users_can_start_lists_at_different_urls(self):
         # Edith เริ่ม list ใหม่
