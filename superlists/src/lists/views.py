@@ -43,3 +43,21 @@ def add_item(request, list_id):
         priority=priority # <--- บันทึก Priority ลงไป
     )
     return redirect(f"/lists/{our_list.id}/")
+
+def edit_item(request, list_id, item_id):
+    # 1. ดึง Item ที่ต้องการแก้มาจาก Database
+    item = Item.objects.get(id=item_id)
+    
+    # 2. ถ้ามีการกด Save (ส่งข้อมูลแบบ POST มา)
+    if request.method == 'POST':
+        new_text = request.POST.get('item_text') # รับค่าจากช่องกรอก
+        item.text = new_text        # อัปเดตข้อความใน Object
+        item.save()                 # บันทึกลง Database
+        return redirect(f'/lists/{list_id}/') # เด้งกลับไปหน้า List เดิม
+    
+    # 3. ถ้าเพิ่งกดเข้ามา (GET) ให้ส่งไปหน้าฟอร์มแก้ไข
+    return render(request, 'edit_item.html', {'item': item, 'list_id': list_id})
+
+
+def landing_page(request):
+    return render(request, 'landing.html')

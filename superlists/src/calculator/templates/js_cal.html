@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculator</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; text-align: center; }
+        .calc-box { 
+            border: 1px solid #ccc; 
+            padding: 20px; 
+            border-radius: 8px; 
+            width: 300px; 
+            margin: 0 auto; /* จัดกึ่งกลาง */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        input, select, button { margin: 10px 0; width: 100%; padding: 10px; box-sizing: border-box;}
+        button { background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #218838; }
+        #result { color: green; font-weight: bold; font-size: 1.5em; }
+
+        /* 👇 CSS สำหรับปุ่ม Back to Home */
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #6c757d; /* สีเทา */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn-back:hover { background-color: #5a6268; }
+    </style>
+</head>
+<body>
+
+    <h1>Calculator</h1>
+    
+    <div class="calc-box">
+        <form onsubmit="calculate(); return false;">
+            <label>Number 1:</label>
+            <input type="number" id="num1" required placeholder="put first number">
+
+            <label>Operator:</label>
+            <select id="operator">
+                <option value="add">+</option>
+                <option value="subtract">-</option>
+                <option value="multiply">x</option>
+                <option value="divide">/</option>
+            </select>
+
+            <label>Number 2:</label>
+            <input type="number" id="num2" required placeholder="put second number">
+
+            <button type="submit">Calculate</button>
+        </form>
+
+        <hr>
+        <h3>Result: <span id="result">0</span></h3>
+    </div>
+
+    <a href="/calc/" class="btn-back">Back to calculators</a>
+
+    <script>
+        function calculate() {
+            let n1 = parseFloat(document.getElementById('num1').value);
+            let n2 = parseFloat(document.getElementById('num2').value);
+            let op = document.getElementById('operator').value;
+            let result = 0;
+
+            if (op === 'add') result = n1 + n2;
+            else if (op === 'subtract') result = n1 - n2;
+            else if (op === 'multiply') result = n1 * n2;
+            else if (op === 'divide') {
+                if (n2 !== 0) result = n1 / n2;
+                else result = "Error";
+            }
+            document.getElementById('result').innerText = result;
+        }
+    </script>
+
+</body>
+</html>

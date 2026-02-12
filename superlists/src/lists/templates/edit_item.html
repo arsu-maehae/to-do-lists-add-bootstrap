@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Item</title>
+</head>
+<body>
+    <h1>Edit Your Item</h1>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <input name="item_text" type="text" value="{{ item.text }}" />
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <br>
+    <a href="/lists/{{ list_id }}/">Cancel (Back to list)</a>
+</body>
+</html>

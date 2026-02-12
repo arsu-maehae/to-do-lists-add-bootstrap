@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Django Calculator</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; text-align: center; }
+        .calc-box { 
+            border: 1px solid #ccc; 
+            padding: 20px; 
+            border-radius: 8px; 
+            width: 300px; 
+            margin: 0 auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        input, select, button { margin: 10px 0; width: 100%; padding: 10px; box-sizing: border-box;}
+        button { background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #0056b3; }
+        .btn-back { display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>Calculator (Server-Side)</h1>
+    
+    <div class="calc-box">
+        <form method="POST">
+            {% csrf_token %}
+            
+            <label>Number 1:</label>
+            <input type="number" name="num1" step="any" required placeholder="ใส่ตัวเลขแรก">
+
+            <label>Operator:</label>
+            <select name="operator">
+                <option value="add">+</option>
+                <option value="subtract">-</option>
+                <option value="multiply">x</option>
+                <option value="divide">/</option>
+            </select>
+
+            <label>Number 2:</label>
+            <input type="number" name="num2" step="any" required placeholder="ใส่ตัวเลขที่สอง">
+
+            <button type="submit">Calculate</button>
+        </form>
+
+        <hr>
+        <h3>Result: 
+            {% if result is not None %}
+                <span style="color: green;">{{ result }}</span>
+            {% else %}
+                -
+            {% endif %}
+        </h3>
+    </div>
+
+    <a href="/calc/" class="btn-back">🏠 Back to calculators</a>
+
+</body>
+</html>

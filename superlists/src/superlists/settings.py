@@ -25,12 +25,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #SECRET_KEY = 'django-insecure-tblvhvfm=k+d^w1lp9dr3hw3guyj)$%(#9@arkugcj*^^s_1=x'
 
 # อ่าน Key จาก Server ถ้าไม่มีให้ใช้คีย์เดิม
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-tblvhvfm=k+d^w1lp9dr3hw3guyj)$%(#9@arkugcj*^^s_1=x')
+#SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-tblvhvfm=k+d^w1lp9dr3hw3guyj)$%(#9@arkugcj*^^s_1=x')
+    
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# --- 1. ส่วนตั้งค่า Environment (Dev vs Prod) ---
+if "DJANGO_DEBUG_FALSE" in os.environ:
+    # โหมด Production (Docker/Railway)
+    DEBUG = False
+    SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
+    ALLOWED_HOSTS = [os.environ["DJANGO_ALLOWED_HOST"]]
+    db_path = os.environ["DJANGO_DB_PATH"]
+else:
+    # โหมด Development (เครื่องเรา)
+    DEBUG = True
+    SECRET_KEY = "insecure-key-for-dev"
+    ALLOWED_HOSTS = ['*']
+    db_path = BASE_DIR / "db.sqlite3"
 #DEBUG = True --- เปลี่ยนบรรทัดนี้เป็นบรรทัดล่างนี้
-# ถ้าเจอตัวแปร FLY_APP_NAME แปลว่าอยู่บน Server ให้ปิด Debug
-DEBUG = 'FLY_APP_NAME' not in os.environ
 
 # อนุญาตให้เข้าได้ทุกเว็บ
 ALLOWED_HOSTS = ['*']
@@ -54,11 +65,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'lists',
+    'calculator'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # <--- เพิ่มอันนี้ fly.io
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # <--- เพิ่มอันนี้ 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -107,7 +119,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            "NAME": db_path,
         }
     }
 

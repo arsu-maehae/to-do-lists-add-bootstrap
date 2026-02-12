@@ -18,6 +18,12 @@
                 <span class="badge bg-success">Low</span>
             {% endif %}
             </td>
+            
+            <td>
+            <a href="{% url 'edit_item' list.id item.id %}">
+                <button>Edit</button>
+            </a>
+        </td>
       </tr>
     {% endfor %}
   </table>

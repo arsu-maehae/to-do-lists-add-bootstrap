@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Calculator</title>
+    <style>
+        body { text-align: center; font-family: sans-serif; padding-top: 50px; }
+        .btn {
+            display: inline-block;
+            padding: 20px 40px;
+            margin: 20px;
+            font-size: 18px;
+            text-decoration: none;
+            color: white;
+            border-radius: 10px;
+            width: 250px;
+        }
+        .btn-js { background-color: #ffc107; color: black; } /* สีเหลือง */
+        .btn-django { background-color: #007bff; } /* สีน้ำเงิน */
+        .btn-home { background-color: #6c757d; margin-top: 40px; } /* สีเทา */
+        
+        .btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <h1>🧮 Calculator App</h1>
+    <p>Please select calculation mode:</p>
+
+    <a href="/calc/js/" class="btn btn-js">⚡ JavaScript Style<br><small>(Client-Side)</small></a>
+    <br>
+    
+    <a href="/calc/django/" class="btn btn-django">🐢 Django Style<br><small>(Server-Side)</small></a>
+
+    <br><hr><br>
+    
+    <a href="/" class="btn btn-home">🏠 Back to Main Home</a>
+</body>
+</html>

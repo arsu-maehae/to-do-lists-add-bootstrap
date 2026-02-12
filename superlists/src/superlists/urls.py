@@ -18,7 +18,7 @@ from django.urls import path, include
 from lists import views as list_views
 
 urlpatterns = [
-    path('', list_views.home_page, name='home'),
+    path('', list_views.landing_page, name='landing'),
     #path("lists/the-only-list-in-the-world/", views.home_page, name="view_list"),  # เพิ่มบรรทัดนี้
     #path("lists/the-only-list-in-the-world/", views.view_list, name="view_list"), # เปลี่ยนเป็นเรียก view_list
    # path("lists/<int:list_id>/", views.view_list, name="view_list"),
@@ -26,4 +26,6 @@ urlpatterns = [
     #path("lists/<int:list_id>/add_item", views.add_item, name="add_item"), # เพิ่มบรรทัดนี้
     path("lists/", include("lists.urls")),
     path('about/', list_views.about_page, name='about'),
+    path('calc/', include('calculator.urls')),
+    
 ]
